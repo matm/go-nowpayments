@@ -20,12 +20,20 @@ var routes map[string]routeAttr = map[string]routeAttr{
 	"status":     {http.MethodGet, "/status"},
 	"currencies": {http.MethodGet, "/currencies"},
 	"estimate":   {http.MethodGet, "/estimate"},
+	"min-amount": {http.MethodGet, "/min-amount"},
 }
 
 var (
 	defaultURL types.BaseURL = types.SandBoxBaseURL
 	apiKey     string
 )
+
+var debug = false
+
+// WithDebug prints out debugging info about HTTP traffic.
+func WithDebug(d bool) {
+	debug = d
+}
 
 // UseBaseURL sets the base URL to use to connect to NOWPayment's API.
 func UseBaseURL(b types.BaseURL) {
@@ -52,6 +60,9 @@ func APIKey() string {
 func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface{}) error {
 	client := &http.Client{}
 	method, path := routes[endpoint].method, routes[endpoint].path
+	if path == "" {
+		return eris.New(fmt.Sprintf("empty path for endpoint %q", endpoint))
+	}
 	u := string(defaultURL) + path
 	if values != nil {
 		u += "?" + values.Encode()
@@ -61,6 +72,11 @@ func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface
 		return eris.Wrap(err, endpoint)
 	}
 	req.Header.Add("X-API-KEY", apiKey)
+	if debug {
+		fmt.Println(">>> DEBUG")
+		fmt.Println(req.Method, req.URL.String())
+		fmt.Println("<<< DEBUG")
+	}
 	res, err := client.Do(req)
 	if err != nil {
 		return eris.Wrap(err, endpoint)

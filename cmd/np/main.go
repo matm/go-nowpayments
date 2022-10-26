@@ -20,6 +20,7 @@ func main() {
 	}
 	core.UseAPIKey(key)
 	core.UseBaseURL(types.ProductionBaseURL)
+	//core.WithDebug(true)
 
 	st, err := core.Status()
 	if err != nil {
@@ -39,4 +40,10 @@ func main() {
 	}
 	fmt.Printf("Estimation: %f %s == %s %s\n", ep.AmountFrom, strings.ToUpper(ep.CurrencyFrom),
 		ep.EstimatedAmount, strings.ToUpper(ep.CurrencyTo))
+
+	ma, err := payments.MinimumAmount("xmr", "btc")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Minimum amount:", ma.Amount)
 }
