@@ -1,9 +1,13 @@
 package core
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/matm/go-nowpayments/pkg/types"
+	"github.com/rotisserie/eris"
 )
 
 type routeAttr struct {
@@ -14,10 +18,6 @@ type routeAttr struct {
 var routes map[string]routeAttr = map[string]routeAttr{
 	"status":     {http.MethodGet, "/status"},
 	"currencies": {http.MethodGet, "/currencies"},
-}
-
-func Route(name string) (string, string) {
-	return routes[name].method, routes[name].path
 }
 
 var (
@@ -35,10 +35,46 @@ func BaseURL() string {
 	return string(defaultURL)
 }
 
+// UseAPIKey sets the API key to use for all requests.
 func UseAPIKey(key string) {
 	apiKey = key
 }
 
+// APIKey returns the current API key set or the default URL to sandbox.
 func APIKey() string {
 	return apiKey
+}
+
+// HTTPSend sends to endpoint with an optional request body and get the HTTP
+// response result in into.
+func HTTPSend(endpoint string, body io.Reader, into interface{}) error {
+	client := &http.Client{}
+	method, path := routes[endpoint].method, routes[endpoint].path
+	req, err := http.NewRequest(method, string(defaultURL)+path, body)
+	if err != nil {
+		return eris.Wrap(err, endpoint)
+	}
+	req.Header.Add("X-API-KEY", apiKey)
+	res, err := client.Do(req)
+	if err != nil {
+		return eris.Wrap(err, endpoint)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		type errResp struct {
+			StatusCode int    `json:"statusCode"`
+			Code       string `json:"code"`
+			Message    string `json:"message"`
+		}
+		z := &errResp{}
+		d := json.NewDecoder(res.Body)
+		err = d.Decode(&z)
+		if err != nil {
+			return eris.Wrap(err, endpoint)
+		}
+		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
+	}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&into)
+	return eris.Wrap(err, endpoint)
 }
