@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/matm/go-nowpayments/pkg/core"
 	"github.com/matm/go-nowpayments/pkg/currencies"
+	"github.com/matm/go-nowpayments/pkg/payments"
 	"github.com/matm/go-nowpayments/pkg/types"
 )
 
@@ -30,4 +32,11 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("Currencies:", cs)
+
+	ep, err := payments.EstimatedPrice(100, "eur", "xmr")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Estimation: %f %s == %s %s\n", ep.AmountFrom, strings.ToUpper(ep.CurrencyFrom),
+		ep.EstimatedAmount, strings.ToUpper(ep.CurrencyTo))
 }

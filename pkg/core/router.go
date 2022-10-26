@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
@@ -18,6 +19,7 @@ type routeAttr struct {
 var routes map[string]routeAttr = map[string]routeAttr{
 	"status":     {http.MethodGet, "/status"},
 	"currencies": {http.MethodGet, "/currencies"},
+	"estimate":   {http.MethodGet, "/estimate"},
 }
 
 var (
@@ -47,10 +49,14 @@ func APIKey() string {
 
 // HTTPSend sends to endpoint with an optional request body and get the HTTP
 // response result in into.
-func HTTPSend(endpoint string, body io.Reader, into interface{}) error {
+func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface{}) error {
 	client := &http.Client{}
 	method, path := routes[endpoint].method, routes[endpoint].path
-	req, err := http.NewRequest(method, string(defaultURL)+path, body)
+	u := string(defaultURL) + path
+	if values != nil {
+		u += "?" + values.Encode()
+	}
+	req, err := http.NewRequest(method, u, body)
 	if err != nil {
 		return eris.Wrap(err, endpoint)
 	}

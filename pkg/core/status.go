@@ -12,9 +12,6 @@ type st struct {
 // fine, otherwise an error message is returned.
 func Status() (string, error) {
 	s := &st{}
-	err := HTTPSend("status", nil, &s)
-	if err != nil {
-		return "", eris.Wrap(err, "status")
-	}
-	return s.Message, nil
+	err := HTTPSend("status", nil, nil, &s)
+	return s.Message, eris.Wrap(err, "status")
 }

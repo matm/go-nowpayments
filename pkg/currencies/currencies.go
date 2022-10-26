@@ -12,9 +12,6 @@ type curr struct {
 // All returns a list of all supported cryptocurrencies.
 func All() ([]string, error) {
 	c := &curr{}
-	err := core.HTTPSend("currencies", nil, &c)
-	if err != nil {
-		return c.Currencies, eris.Wrap(err, "all")
-	}
-	return c.Currencies, nil
+	err := core.HTTPSend("currencies", nil, nil, &c)
+	return c.Currencies, eris.Wrap(err, "all")
 }
