@@ -18,6 +18,11 @@ func EstimatedPrice(amount float64, currencyFrom, currencyTo string) (*types.Est
 	u.Set("currency_from", currencyFrom)
 	u.Set("currency_to", currencyTo)
 	e := &types.Estimate{}
-	err := core.HTTPSend("estimate", nil, u, &e)
+	par := &types.SendParams{
+		RouteName: "estimate",
+		Into:      &e,
+		Values:    u,
+	}
+	err := core.HTTPSend(par)
 	return e, eris.Wrap(err, "estimate")
 }

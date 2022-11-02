@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
 
@@ -12,6 +13,10 @@ type st struct {
 // fine, otherwise an error message is returned.
 func Status() (string, error) {
 	s := &st{}
-	err := HTTPSend("status", nil, nil, &s)
+	par := &types.SendParams{
+		RouteName: "status",
+		Into:      &s,
+	}
+	err := HTTPSend(par)
 	return s.Message, eris.Wrap(err, "status")
 }

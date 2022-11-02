@@ -3,10 +3,9 @@ package core
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 
+	"github.com/matm/go-nowpayments/pkg/config"
 	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
@@ -17,15 +16,16 @@ type routeAttr struct {
 }
 
 var routes map[string]routeAttr = map[string]routeAttr{
-	"status":     {http.MethodGet, "/status"},
-	"currencies": {http.MethodGet, "/currencies"},
-	"estimate":   {http.MethodGet, "/estimate"},
-	"min-amount": {http.MethodGet, "/min-amount"},
+	"status":         {http.MethodGet, "/status"},
+	"currencies":     {http.MethodGet, "/currencies"},
+	"estimate":       {http.MethodGet, "/estimate"},
+	"min-amount":     {http.MethodGet, "/min-amount"},
+	"payment-status": {http.MethodGet, "/payment"},
+	"auth":           {http.MethodPost, "/auth"},
 }
 
 var (
 	defaultURL types.BaseURL = types.SandBoxBaseURL
-	apiKey     string
 )
 
 var debug = false
@@ -45,33 +45,34 @@ func BaseURL() string {
 	return string(defaultURL)
 }
 
-// UseAPIKey sets the API key to use for all requests.
-func UseAPIKey(key string) {
-	apiKey = key
-}
-
-// APIKey returns the current API key set or the default URL to sandbox.
-func APIKey() string {
-	return apiKey
-}
-
 // HTTPSend sends to endpoint with an optional request body and get the HTTP
 // response result in into.
-func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface{}) error {
+func HTTPSend(p *types.SendParams) error {
+	if p == nil {
+		return eris.New("nil params")
+	}
 	client := &http.Client{}
-	method, path := routes[endpoint].method, routes[endpoint].path
+	method, path := routes[p.RouteName].method, routes[p.RouteName].path
 	if path == "" {
-		return eris.New(fmt.Sprintf("empty path for endpoint %q", endpoint))
+		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))
 	}
 	u := string(defaultURL) + path
-	if values != nil {
-		u += "?" + values.Encode()
+	if p.Values != nil {
+		u += "?" + p.Values.Encode()
 	}
-	req, err := http.NewRequest(method, u, body)
+	req, err := http.NewRequest(method, u, p.Body)
 	if err != nil {
-		return eris.Wrap(err, endpoint)
+		return eris.Wrap(err, p.RouteName)
 	}
-	req.Header.Add("X-API-KEY", apiKey)
+	// Extra headers.
+	req.Header.Add("X-API-KEY", config.APIKey())
+	if p.Body != nil {
+		req.Header.Add("Content-Type", "application/json")
+	}
+	if p.Token != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", p.Token))
+	}
+
 	if debug {
 		fmt.Println(">>> DEBUG")
 		fmt.Println(req.Method, req.URL.String())
@@ -79,7 +80,7 @@ func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		return eris.Wrap(err, endpoint)
+		return eris.Wrap(err, p.RouteName)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
@@ -92,11 +93,11 @@ func HTTPSend(endpoint string, body io.Reader, values url.Values, into interface
 		d := json.NewDecoder(res.Body)
 		err = d.Decode(&z)
 		if err != nil {
-			return eris.Wrap(err, endpoint)
+			return eris.Wrap(err, p.RouteName)
 		}
 		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
 	}
 	d := json.NewDecoder(res.Body)
-	err = d.Decode(&into)
-	return eris.Wrap(err, endpoint)
+	err = d.Decode(&p.Into)
+	return eris.Wrap(err, p.RouteName)
 }

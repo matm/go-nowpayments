@@ -14,6 +14,11 @@ func MinimumAmount(currencyFrom, currencyTo string) (*types.MinimumAmount, error
 	u.Set("currency_from", currencyFrom)
 	u.Set("currency_to", currencyTo)
 	e := &types.MinimumAmount{}
-	err := core.HTTPSend("min-amount", nil, u, &e)
+	par := &types.SendParams{
+		RouteName: "min-amount",
+		Into:      &e,
+		Values:    u,
+	}
+	err := core.HTTPSend(par)
 	return e, eris.Wrap(err, "minamount")
 }

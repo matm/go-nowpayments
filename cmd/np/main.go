@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
+	"github.com/matm/go-nowpayments/pkg/config"
 	"github.com/matm/go-nowpayments/pkg/core"
 	"github.com/matm/go-nowpayments/pkg/currencies"
 	"github.com/matm/go-nowpayments/pkg/payments"
@@ -13,13 +13,11 @@ import (
 )
 
 func main() {
-	key := os.Getenv("NP_API_KEY")
-	if key == "" {
-		fmt.Fprintln(os.Stderr, "Missing API key")
-		os.Exit(2)
+	err := config.Load("conf.json")
+	if err != nil {
+		log.Fatal(err)
 	}
-	core.UseAPIKey(key)
-	core.UseBaseURL(types.ProductionBaseURL)
+	core.UseBaseURL(types.SandBoxBaseURL)
 	//core.WithDebug(true)
 
 	st, err := core.Status()
@@ -46,4 +44,10 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("Minimum amount:", ma.Amount)
+
+	ps, err := payments.Status("abcd")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Payment status:", ps)
 }
