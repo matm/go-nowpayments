@@ -17,6 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 	core.UseBaseURL(core.SandBoxBaseURL)
+	core.UseClient(core.NewHTTPClient())
 	//core.WithDebug(true)
 
 	st, err := core.Status()
