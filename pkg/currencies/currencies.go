@@ -2,7 +2,6 @@ package currencies
 
 import (
 	"github.com/matm/go-nowpayments/pkg/core"
-	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
 
@@ -13,7 +12,7 @@ type curr struct {
 // All returns a list of all supported cryptocurrencies.
 func All() ([]string, error) {
 	c := &curr{}
-	par := &types.SendParams{
+	par := &core.SendParams{
 		RouteName: "currencies",
 		Into:      &c,
 	}

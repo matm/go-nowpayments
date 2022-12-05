@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
 
@@ -13,7 +12,7 @@ type st struct {
 // fine, otherwise an error message is returned.
 func Status() (string, error) {
 	s := &st{}
-	par := &types.SendParams{
+	par := &SendParams{
 		RouteName: "status",
 		Into:      &s,
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
 
@@ -20,7 +19,7 @@ func Authenticate(email, password string) (string, error) {
 			"password": "%s"
 		}`, email, password))
 	t := &token{}
-	par := &types.SendParams{
+	par := &SendParams{
 		RouteName: "auth",
 		Body:      r,
 		Into:      &t,

@@ -9,7 +9,6 @@ import (
 	"github.com/matm/go-nowpayments/pkg/core"
 	"github.com/matm/go-nowpayments/pkg/currencies"
 	"github.com/matm/go-nowpayments/pkg/payments"
-	"github.com/matm/go-nowpayments/pkg/types"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	core.UseBaseURL(types.SandBoxBaseURL)
+	core.UseBaseURL(core.SandBoxBaseURL)
 	//core.WithDebug(true)
 
 	st, err := core.Status()

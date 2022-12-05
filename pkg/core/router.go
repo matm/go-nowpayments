@@ -3,12 +3,33 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/matm/go-nowpayments/pkg/config"
-	"github.com/matm/go-nowpayments/pkg/types"
 	"github.com/rotisserie/eris"
 )
+
+type baseURL string
+
+const (
+	// ProductionBaseURL is the URL to the production service.
+	ProductionBaseURL baseURL = "https://api.nowpayments.io/v1"
+	// SandBoxBaseURL is the URL to the sandbox service.
+	SandBoxBaseURL = "https://api-sandbox.nowpayments.io/v1"
+)
+
+// SendParams are parameters needed to build and send an HTTP request to the service.
+type SendParams struct {
+	Body      io.Reader
+	Into      interface{}
+	Path      string
+	RouteName string
+	Values    url.Values
+	// JWT token obtained after authentication.
+	Token string
+}
 
 type routeAttr struct {
 	method string
@@ -25,7 +46,7 @@ var routes map[string]routeAttr = map[string]routeAttr{
 }
 
 var (
-	defaultURL types.BaseURL = types.SandBoxBaseURL
+	defaultURL baseURL = SandBoxBaseURL
 )
 
 var debug = false
@@ -36,7 +57,7 @@ func WithDebug(d bool) {
 }
 
 // UseBaseURL sets the base URL to use to connect to NOWPayment's API.
-func UseBaseURL(b types.BaseURL) {
+func UseBaseURL(b baseURL) {
 	defaultURL = b
 }
 
@@ -47,7 +68,7 @@ func BaseURL() string {
 
 // HTTPSend sends to endpoint with an optional request body and get the HTTP
 // response result in into.
-func HTTPSend(p *types.SendParams) error {
+func HTTPSend(p *SendParams) error {
 	if p == nil {
 		return eris.New("nil params")
 	}
