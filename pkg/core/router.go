@@ -72,7 +72,6 @@ func HTTPSend(p *SendParams) error {
 	if p == nil {
 		return eris.New("nil params")
 	}
-	client := &http.Client{}
 	method, path := routes[p.RouteName].method, routes[p.RouteName].path
 	if path == "" {
 		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))

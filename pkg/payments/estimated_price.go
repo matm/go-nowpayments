@@ -8,6 +8,7 @@ import (
 	"github.com/rotisserie/eris"
 )
 
+// Estimate holds the estimated amount of crypto for a given Fiat value.
 type Estimate struct {
 	CurrencyFrom    string  `json:"currency_from"`
 	CurrencyTo      string  `json:"currency_to"`
