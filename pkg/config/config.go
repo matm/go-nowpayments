@@ -2,26 +2,23 @@ package config
 
 import (
 	"encoding/json"
-	"os"
+	"io"
 
 	"github.com/rotisserie/eris"
 )
 
 type credentials struct {
-	Login, Password string
-	APIKey          string
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	APIKey   string `json:"apiKey"`
 }
 
 var conf credentials
 
 // Load parses a JSON file to get the required credentials to operate NOWPayment's API.
-func Load(filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return eris.Wrap(err, "load config")
-	}
-	d := json.NewDecoder(f)
-	err = d.Decode(&conf)
+func Load(r io.Reader) error {
+	d := json.NewDecoder(r)
+	err := d.Decode(&conf)
 	return eris.Wrap(err, "decode config")
 }
 

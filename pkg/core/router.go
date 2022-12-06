@@ -113,7 +113,7 @@ func HTTPSend(p *SendParams) error {
 		d := json.NewDecoder(res.Body)
 		err = d.Decode(&z)
 		if err != nil {
-			return eris.Wrap(err, p.RouteName)
+			return eris.Wrapf(err, "%s: JSON decode error", p.RouteName)
 		}
 		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
 	}
