@@ -171,3 +171,26 @@ func TestHTTPSend(t *testing.T) {
 		})
 	}
 }
+
+func TestWithDebug(t *testing.T) {
+	type args struct {
+		d bool
+	}
+	tests := []struct {
+		name  string
+		args  args
+		after func()
+	}{
+		{"debug on", args{true}, func() {
+			assert.Equal(t, true, debug)
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			WithDebug(tt.args.d)
+			if tt.after != nil {
+				tt.after()
+			}
+		})
+	}
+}
