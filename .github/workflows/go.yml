@@ -24,5 +24,8 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Test dependencies
+      run: go install github.com/vektra/mockery/v2@latest
+
     - name: Test
-      run: go test -v ./...
+      run: make test

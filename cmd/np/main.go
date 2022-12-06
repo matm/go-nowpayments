@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/matm/go-nowpayments/pkg/config"
@@ -12,11 +13,17 @@ import (
 )
 
 func main() {
-	err := config.Load("conf.json")
+	f, err := os.Open("conf.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	err = config.Load(f)
 	if err != nil {
 		log.Fatal(err)
 	}
 	core.UseBaseURL(core.SandBoxBaseURL)
+	core.UseClient(core.NewHTTPClient())
 	//core.WithDebug(true)
 
 	st, err := core.Status()

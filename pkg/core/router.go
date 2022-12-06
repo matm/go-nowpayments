@@ -72,7 +72,6 @@ func HTTPSend(p *SendParams) error {
 	if p == nil {
 		return eris.New("nil params")
 	}
-	client := &http.Client{}
 	method, path := routes[p.RouteName].method, routes[p.RouteName].path
 	if path == "" {
 		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))
@@ -114,7 +113,7 @@ func HTTPSend(p *SendParams) error {
 		d := json.NewDecoder(res.Body)
 		err = d.Decode(&z)
 		if err != nil {
-			return eris.Wrap(err, p.RouteName)
+			return eris.Wrapf(err, "%s: JSON decode error", p.RouteName)
 		}
 		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
 	}
