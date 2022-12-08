@@ -46,7 +46,6 @@ func TestAll(t *testing.T) {
 					assert.NotNil(req)
 					assert.Equal("/v1/currencies", req.URL.Path, "bad endpoint")
 				}).Return(resp, nil)
-
 			}, func(c []string, err error) {
 				require.NoError(t, err)
 				assert.EqualValues([]string{"xmr", "xno"}, c)
