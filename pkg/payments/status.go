@@ -35,7 +35,6 @@ func Status(paymentID string) (*PaymentStatus, error) {
 	if err != nil {
 		return nil, eris.Wrap(err, "status")
 	}
-
 	st := &PaymentStatus{}
 	par := &core.SendParams{
 		RouteName: "payment-status",
@@ -44,5 +43,8 @@ func Status(paymentID string) (*PaymentStatus, error) {
 		Token:     tok,
 	}
 	err = core.HTTPSend(par)
-	return st, eris.Wrap(err, "payment status")
+	if err != nil {
+		return nil, err
+	}
+	return st, nil
 }
