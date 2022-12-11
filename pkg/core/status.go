@@ -1,9 +1,5 @@
 package core
 
-import (
-	"github.com/rotisserie/eris"
-)
-
 type st struct {
 	Message string `json:"message"`
 }
@@ -17,5 +13,8 @@ func Status() (string, error) {
 		Into:      &s,
 	}
 	err := HTTPSend(par)
-	return s.Message, eris.Wrap(err, "status")
+	if err != nil {
+		return "", err
+	}
+	return s.Message, nil
 }

@@ -20,6 +20,9 @@ type Estimate struct {
 // Need to provide the initial cost in the Fiat currency (amount, currency_from) and the necessary cryptocurrency (currency_to).
 // Currently following fiat currencies are available: usd, eur, nzd, brl.
 func EstimatedPrice(amount float64, currencyFrom, currencyTo string) (*Estimate, error) {
+	if amount == 0 {
+		return nil, eris.New("use a price greater than zero")
+	}
 	u := url.Values{}
 	u.Set("amount", fmt.Sprintf("%f", amount))
 	u.Set("currency_from", currencyFrom)
@@ -31,5 +34,8 @@ func EstimatedPrice(amount float64, currencyFrom, currencyTo string) (*Estimate,
 		Values:    u,
 	}
 	err := core.HTTPSend(par)
-	return e, eris.Wrap(err, "estimate")
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
 }

@@ -3,8 +3,6 @@ package core
 import (
 	"fmt"
 	"strings"
-
-	"github.com/rotisserie/eris"
 )
 
 type token struct {
@@ -25,5 +23,5 @@ func Authenticate(email, password string) (string, error) {
 		Into:      &t,
 	}
 	err := HTTPSend(par)
-	return t.Token, eris.Wrap(err, "auth")
+	return t.Token, err
 }

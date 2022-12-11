@@ -2,7 +2,6 @@ package currencies
 
 import (
 	"github.com/matm/go-nowpayments/pkg/core"
-	"github.com/rotisserie/eris"
 )
 
 type curr struct {
@@ -16,6 +15,5 @@ func All() ([]string, error) {
 		RouteName: "currencies",
 		Into:      &c,
 	}
-	err := core.HTTPSend(par)
-	return c.Currencies, eris.Wrap(err, "all")
+	return c.Currencies, core.HTTPSend(par)
 }
