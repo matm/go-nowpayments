@@ -4,7 +4,6 @@ import (
 	"net/url"
 
 	"github.com/matm/go-nowpayments/pkg/core"
-	"github.com/rotisserie/eris"
 )
 
 // CurrencyAmount has info about minimum payment amount for a specific pair.
@@ -26,5 +25,8 @@ func MinimumAmount(currencyFrom, currencyTo string) (*CurrencyAmount, error) {
 		Values:    u,
 	}
 	err := core.HTTPSend(par)
-	return e, eris.Wrap(err, "minamount")
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
 }
