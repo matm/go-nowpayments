@@ -68,7 +68,7 @@ func TestList(t *testing.T) {
 				assert.Equal("list: auth: bad credentials", err.Error())
 			},
 		},
-		{"with some options", &ListOption{
+		{"with all options", &ListOption{
 			Limit:    2,
 			DateFrom: "2020-01-01",
 			DateTo:   "2022-01-01",
@@ -81,6 +81,28 @@ func TestList(t *testing.T) {
 				c.EXPECT().Do(mock.Anything).Run(func(r *http.Request) {
 					if strings.HasPrefix(r.URL.Path, "/v1/payment") {
 						assert.Equal("dateFrom=2020-01-01&dateTo=2022-01-01&limit=2&orderBy=asc&page=3&sortBy=created_at", r.URL.RawQuery)
+					}
+				}).Return(resp, nil)
+			},
+			nil,
+		},
+		{"with empty options", &ListOption{},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"data":[{"payment_id":1}]}`)
+				c.EXPECT().Do(mock.Anything).Run(func(r *http.Request) {
+					if strings.HasPrefix(r.URL.Path, "/v1/payment") {
+						assert.Equal("page=0", r.URL.RawQuery)
+					}
+				}).Return(resp, nil)
+			},
+			nil,
+		},
+		{"with some options", &ListOption{Limit: 5, OrderBy: "desc"},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"data":[{"payment_id":1}]}`)
+				c.EXPECT().Do(mock.Anything).Run(func(r *http.Request) {
+					if strings.HasPrefix(r.URL.Path, "/v1/payment") {
+						assert.Equal("limit=5&orderBy=desc&page=0", r.URL.RawQuery)
 					}
 				}).Return(resp, nil)
 			},
