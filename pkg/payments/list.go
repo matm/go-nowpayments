@@ -51,7 +51,7 @@ func List(o *ListOption) ([]*PaymentHack, error) {
 	}
 	tok, err := core.Authenticate(config.Login(), config.Password())
 	if err != nil {
-		return nil, eris.Wrap(err, "status")
+		return nil, eris.Wrap(err, "list")
 	}
 	type plist struct {
 		Data []*PaymentHack `json:"data"`
