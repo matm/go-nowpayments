@@ -77,9 +77,9 @@ func HTTPSend(p *SendParams) error {
 	if path == "" {
 		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))
 	}
-	u, err := url.JoinPath(string(defaultURL), path, p.Path)
-	if err != nil {
-		return eris.Wrap(err, "url join path")
+	u := string(defaultURL) + path
+	if p.Path != "" {
+		u += "/" + p.Path
 	}
 	if p.Values != nil {
 		u += "?" + p.Values.Encode()
