@@ -16,6 +16,7 @@ Topic|Endpoint|Implemented
 ||Get list of payments|:heavy_check_mark:
 [Currencies](https://documenter.getpostman.com/view/7907941/S1a32n38#cb80ccdc-8f7c-426c-89df-1ed2241954a5)||Yes
 ||Get available currencies|:heavy_check_mark:
+||Get available checked currencies|:heavy_check_mark:
 [Payouts](https://documenter.getpostman.com/view/7907941/S1a32n38#138ee72b-4c4f-40d0-a565-4a1e907f4d94)||No
 [API status](https://documenter.getpostman.com/view/7907941/S1a32n38#9998079f-dcc8-4e07-9ac7-3d52f0fd733a)||Yes
 ||Get API status|:heavy_check_mark:

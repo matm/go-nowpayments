@@ -1,4 +1,5 @@
 v 1.0.0
+  - Implement get available checked currencies. #12
   - Implement get list of payments. #10
   - Implement create payment. #8
   - Add more unit tests. #6
