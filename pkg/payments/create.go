@@ -38,6 +38,7 @@ type PaymentArgs struct {
 // FIXME: the API doc misses information about returned fields.
 // Misses also HTTP return codes.
 // Why is purchase_id an int instead of a string (payment status response)?
+// Another inconsistency: list of all payments returns a payment ID as an int instead of a string
 // https://documenter.getpostman.com/view/7907941/S1a32n38?version=latest#5e37f3ad-0fa1-4292-af51-5c7f95730486
 type Payment struct {
 	PaymentAmount

@@ -25,12 +25,17 @@ func main() {
 	}
 	core.UseBaseURL(core.SandBoxBaseURL)
 	core.UseClient(core.NewHTTPClient())
-	//core.WithDebug(true)
 
 	paymentID := flag.String("p", "", "status of payment ID")
 	newPayment := flag.Bool("n", false, "new payment")
 	payAmount := flag.Float64("a", 2.0, "pay amount for new payment")
+	listPayments := flag.Bool("l", false, "list all payments")
+	debug := flag.Bool("d", false, "turn debugging on")
 	flag.Parse()
+
+	if *debug {
+		core.WithDebug(true)
+	}
 
 	if *paymentID != "" {
 		ps, err := payments.Status(*paymentID)
@@ -58,6 +63,23 @@ func main() {
 	}
 	fmt.Printf("%d available crypto currencies\n", len(cs))
 
+	if *listPayments {
+		limit := 5
+		fmt.Printf("Showing last %d payments only:\n", limit)
+		all, err := payments.List(&payments.ListOption{
+			Limit: limit,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		d, err := json.Marshal(all)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(d))
+		return
+	}
+
 	if *newPayment {
 		pa := &payments.PaymentArgs{
 			PaymentAmount: payments.PaymentAmount{
@@ -78,5 +100,6 @@ func main() {
 			log.Fatal(err)
 		}
 		fmt.Println(string(d))
+		return
 	}
 }

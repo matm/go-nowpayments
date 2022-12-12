@@ -44,6 +44,7 @@ var routes map[string]routeAttr = map[string]routeAttr{
 	"payment-status": {http.MethodGet, "/payment"},
 	"auth":           {http.MethodPost, "/auth"},
 	"payment-create": {http.MethodPost, "/payment"},
+	"payments-list":  {http.MethodGet, "/payment/"},
 }
 
 var (
@@ -75,7 +76,7 @@ func HTTPSend(p *SendParams) error {
 	}
 	method, path := routes[p.RouteName].method, routes[p.RouteName].path
 	if path == "" {
-		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))
+		return eris.New(fmt.Sprintf("bad route name: empty path for endpoint %q", p.RouteName))
 	}
 	u := string(defaultURL) + path
 	if p.Path != "" {
@@ -99,6 +100,8 @@ func HTTPSend(p *SendParams) error {
 
 	if debug {
 		fmt.Println(">>> DEBUG REQUEST")
+		fmt.Printf("X-API-KEY: %s\n", req.Header.Get("X-API-KEY"))
+		fmt.Printf("Authorization: %s\n", req.Header.Get("Authorization"))
 		fmt.Println(req.Method, req.URL.String())
 		fmt.Println("<<< END DEBUG REQUEST")
 	}
@@ -109,7 +112,7 @@ func HTTPSend(p *SendParams) error {
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
 		if debug {
-			fmt.Println(">>> DEBUG HTTP error:", res.StatusCode, res.Status)
+			fmt.Printf(">>> DEBUG HTTP error %d: %s\n", res.StatusCode, res.Status)
 		}
 		type errResp struct {
 			StatusCode int    `json:"statusCode"`
@@ -124,12 +127,17 @@ func HTTPSend(p *SendParams) error {
 		}
 		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
 	}
-	d := json.NewDecoder(res.Body)
-	err = d.Decode(&p.Into)
 	if debug {
 		fmt.Println(">>> DEBUG RESPONSE")
-		fmt.Printf("%+v\n", p.Into)
+		all, err := io.ReadAll(res.Body)
+		if err != nil {
+			return eris.Wrap(err, "debug response")
+		}
+		fmt.Println(string(all))
 		fmt.Println("<<< END DEBUG RESPONSE")
+		return eris.Wrap(json.Unmarshal(all, &p.Into), p.RouteName)
 	}
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&p.Into)
 	return eris.Wrap(err, p.RouteName)
 }
