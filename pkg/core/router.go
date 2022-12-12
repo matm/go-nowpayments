@@ -128,13 +128,13 @@ func HTTPSend(p *SendParams) error {
 		return eris.New(fmt.Sprintf("code %d (%s): %s", z.StatusCode, z.Code, z.Message))
 	}
 	if debug {
-		fmt.Println(">>> DEBUG RESPONSE")
+		fmt.Println(">>> DEBUG RAW RESPONSE BODY")
 		all, err := io.ReadAll(res.Body)
 		if err != nil {
 			return eris.Wrap(err, "debug response")
 		}
 		fmt.Println(string(all))
-		fmt.Println("<<< END DEBUG RESPONSE")
+		fmt.Println("<<< END DEBUG RAW RESPONSE BODY")
 		return eris.Wrap(json.Unmarshal(all, &p.Into), p.RouteName)
 	}
 	d := json.NewDecoder(res.Body)
