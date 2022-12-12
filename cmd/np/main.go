@@ -31,6 +31,7 @@ func main() {
 	payAmount := flag.Float64("a", 2.0, "pay amount for new payment")
 	listPayments := flag.Bool("l", false, "list all payments")
 	debug := flag.Bool("d", false, "turn debugging on")
+	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
 	flag.Parse()
 
 	if *debug {
@@ -57,11 +58,14 @@ func main() {
 	}
 	fmt.Println("API Status:", st)
 
-	cs, err := currencies.All()
-	if err != nil {
-		log.Fatal(err)
+	if *showCurrencies {
+		cs, err := currencies.Selected()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%d selected (checked) crypto currencies: %v\n", len(cs), cs)
+		return
 	}
-	fmt.Printf("%d available crypto currencies\n", len(cs))
 
 	if *listPayments {
 		limit := 5
