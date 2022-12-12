@@ -27,14 +27,14 @@ func TestStatus(t *testing.T) {
 				assert.Nil(s)
 			},
 		},
-		{"authentication ok", "ID",
+		{"authentication ok", "PID",
 			func(c *mocks.HTTPClient) {
 				c.EXPECT().Do(mock.Anything).Call.Return(
 					func(req *http.Request) *http.Response {
 						switch req.URL.Path {
 						case "/v1/auth":
 							return newResponseOK(`{"token":"tok"}`)
-						case "/v1/payment":
+						case "/v1/payment/PID":
 							return newResponseOK(`{"payment_status":"done","pay_amount":10.0}`)
 						default:
 							t.Fatalf("unexpected route call %q", req.URL.Path)
@@ -77,7 +77,7 @@ func TestStatus(t *testing.T) {
 						switch req.URL.Path {
 						case "/v1/auth":
 							return newResponseOK(`{"token":"tok"}`)
-						case "/v1/payment":
+						case "/v1/payment/ID":
 							return newResponse(http.StatusInternalServerError, "")
 						default:
 							return nil
@@ -87,7 +87,7 @@ func TestStatus(t *testing.T) {
 						switch req.URL.Path {
 						case "/v1/auth":
 							return nil
-						case "/v1/payment":
+						case "/v1/payment/ID":
 							return errors.New("network error")
 						default:
 							return fmt.Errorf("unexpected route call %q", req.URL.Path)

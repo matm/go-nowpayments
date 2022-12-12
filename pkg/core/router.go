@@ -77,7 +77,10 @@ func HTTPSend(p *SendParams) error {
 	if path == "" {
 		return eris.New(fmt.Sprintf("empty path for endpoint %q", p.RouteName))
 	}
-	u := string(defaultURL) + path
+	u, err := url.JoinPath(string(defaultURL), path, p.Path)
+	if err != nil {
+		return eris.Wrap(err, "url join path")
+	}
 	if p.Values != nil {
 		u += "?" + p.Values.Encode()
 	}
@@ -95,16 +98,19 @@ func HTTPSend(p *SendParams) error {
 	}
 
 	if debug {
-		fmt.Println(">>> DEBUG")
+		fmt.Println(">>> DEBUG REQUEST")
 		fmt.Println(req.Method, req.URL.String())
-		fmt.Println("<<< DEBUG")
+		fmt.Println("<<< END DEBUG REQUEST")
 	}
 	res, err := client.Do(req)
 	if err != nil {
 		return eris.Wrap(err, p.RouteName)
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
+		if debug {
+			fmt.Println(">>> DEBUG HTTP error:", res.StatusCode, res.Status)
+		}
 		type errResp struct {
 			StatusCode int    `json:"statusCode"`
 			Code       string `json:"code"`
@@ -120,5 +126,10 @@ func HTTPSend(p *SendParams) error {
 	}
 	d := json.NewDecoder(res.Body)
 	err = d.Decode(&p.Into)
+	if debug {
+		fmt.Println(">>> DEBUG RESPONSE")
+		fmt.Printf("%+v\n", p.Into)
+		fmt.Println("<<< END DEBUG RESPONSE")
+	}
 	return eris.Wrap(err, p.RouteName)
 }

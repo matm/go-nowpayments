@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/matm/go-nowpayments/pkg/config"
 	"github.com/matm/go-nowpayments/pkg/core"
@@ -26,6 +27,25 @@ func main() {
 	core.UseClient(core.NewHTTPClient())
 	//core.WithDebug(true)
 
+	paymentID := flag.String("p", "", "status of payment ID")
+	newPayment := flag.Bool("n", false, "new payment")
+	payAmount := flag.Float64("a", 2.0, "pay amount for new payment")
+	flag.Parse()
+
+	if *paymentID != "" {
+		ps, err := payments.Status(*paymentID)
+		if err != nil {
+			log.Fatal(err)
+		}
+		d, err := json.Marshal(ps)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(d))
+		return
+	}
+
+	fmt.Println("Sandbox:", core.BaseURL() == core.SandBoxBaseURL)
 	st, err := core.Status()
 	if err != nil {
 		log.Fatal(err)
@@ -36,24 +56,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Currencies:", cs)
+	fmt.Printf("%d available crypto currencies\n", len(cs))
 
-	ep, err := payments.EstimatedPrice(100, "eur", "xmr")
-	if err != nil {
-		log.Fatal(err)
+	if *newPayment {
+		pa := &payments.PaymentArgs{
+			PaymentAmount: payments.PaymentAmount{
+				PriceAmount:      *payAmount,
+				PriceCurrency:    "eur",
+				PayCurrency:      "xmr",
+				OrderID:          "tool 1",
+				OrderDescription: "Some useful tool",
+			},
+		}
+		fmt.Printf("Creating a %.2f payment ...\n", pa.PriceAmount)
+		pay, err := payments.New(pa)
+		if err != nil {
+			log.Fatal(err)
+		}
+		d, err := json.Marshal(pay)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(d))
 	}
-	fmt.Printf("Estimation: %f %s == %s %s\n", ep.AmountFrom, strings.ToUpper(ep.CurrencyFrom),
-		ep.EstimatedAmount, strings.ToUpper(ep.CurrencyTo))
-
-	ma, err := payments.MinimumAmount("xmr", "btc")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Minimum amount:", ma.Amount)
-
-	ps, err := payments.Status("abcd")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Payment status:", ps)
 }

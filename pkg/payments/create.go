@@ -1,32 +1,43 @@
 package payments
 
 import (
+	"encoding/json"
+	"errors"
+	"strings"
+
 	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/rotisserie/eris"
 )
 
+// PaymentAmount defines common fields used in PaymentArgs and
+// Payment structs.
 type PaymentAmount struct {
 	PriceAmount      float64 `json:"price_amount"`
 	PriceCurrency    string  `json:"price_currency"`
-	PayAmount        float64 `json:"pay_amount"`
+	PayAmount        float64 `json:"pay_amount,omitempty"`
 	PayCurrency      string  `json:"pay_currency"`
-	CallbackURL      string  `json:"ipn_callback_url"`
-	OrderID          string  `json:"order_id"`
-	OrderDescription string  `json:"order_derscription"`
+	CallbackURL      string  `json:"ipn_callback_url,omitempty"`
+	OrderID          string  `json:"order_id,omitempty"`
+	OrderDescription string  `json:"order_description,omitempty"`
 }
 
+// PaymentArgs are the arguments used to make a payment.
 type PaymentArgs struct {
 	PaymentAmount
 
-	FeePaidByUser  bool   `json:"is_fee_paid_by_user"`
-	FixedRate      bool   `json:"fixed_rate"`
-	PayoutAddress  string `json:"payout_address"`
-	PayoutCurrency string `json:"payout_currency"`
-	PayoutExtraID  string `json:"payout_extra_id"`
-	PurchaseID     string `json:"purchase_id"`
+	FeePaidByUser  bool   `json:"is_fee_paid_by_user,omitempty"`
+	FixedRate      bool   `json:"fixed_rate,omitempty"`
+	PayoutAddress  string `json:"payout_address,omitempty"`
+	PayoutCurrency string `json:"payout_currency,omitempty"`
+	PayoutExtraID  string `json:"payout_extra_id,omitempty"`
+	PurchaseID     string `json:"purchase_id,omitempty"`
 }
 
-// Payment holds payment related information.
+// Payment holds payment related information once we get a response
+// from the server.
 // FIXME: the API doc misses information about returned fields.
+// Misses also HTTP return codes.
+// Why is purchase_id an int instead of a string (payment status response)?
 // https://documenter.getpostman.com/view/7907941/S1a32n38?version=latest#5e37f3ad-0fa1-4292-af51-5c7f95730486
 type Payment struct {
 	PaymentAmount
@@ -47,14 +58,22 @@ type Payment struct {
 	UpdatedAt              string  `json:"updated_at"`
 }
 
-// Create creates a payment.
-func Create(a *PaymentArgs) (*Payment, error) {
+// New creates a payment.
+func New(pa *PaymentArgs) (*Payment, error) {
+	if pa == nil {
+		return nil, errors.New("nil payment args")
+	}
+	d, err := json.Marshal(pa)
+	if err != nil {
+		return nil, eris.Wrap(err, "payment args")
+	}
 	p := &Payment{}
 	par := &core.SendParams{
 		RouteName: "payment-create",
 		Into:      &p,
+		Body:      strings.NewReader(string(d)),
 	}
-	err := core.HTTPSend(par)
+	err = core.HTTPSend(par)
 	if err != nil {
 		return nil, err
 	}

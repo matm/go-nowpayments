@@ -15,10 +15,10 @@ type PaymentStatus struct {
 	OutcomeCurrency string  `json:"outcome_currency"`
 	PayAddress      string  `json:"pay_address"`
 	PayAmount       float64 `json:"pay_amount"`
-	PayCurrency     float64 `json:"pay_currency"`
+	PayCurrency     string  `json:"pay_currency"`
 	PriceAmount     float64 `json:"price_amount"`
 	PriceCurrency   string  `json:"price_currency"`
-	PurchaseID      string  `json:"purchase_id"`
+	PurchaseID      int     `json:"purchase_id"`
 	Status          string  `json:"payment_status"`
 	UpdatedAt       string  `json:"updated_at"`
 }
