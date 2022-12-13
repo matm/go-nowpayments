@@ -40,6 +40,7 @@ var routes map[string]routeAttr = map[string]routeAttr{
 	"status":              {http.MethodGet, "/status"},
 	"currencies":          {http.MethodGet, "/currencies"},
 	"estimate":            {http.MethodGet, "/estimate"},
+	"last-estimate":       {http.MethodPost, "/payment"},
 	"min-amount":          {http.MethodGet, "/min-amount"},
 	"payment-status":      {http.MethodGet, "/payment"},
 	"auth":                {http.MethodPost, "/auth"},
