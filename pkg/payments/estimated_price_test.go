@@ -101,3 +101,46 @@ func TestEstimatedPrice(t *testing.T) {
 		})
 	}
 }
+
+func TestRefreshEstimatedPrice(t *testing.T) {
+	assert := assert.New(t)
+	tests := []struct {
+		name      string
+		paymentID string
+		init      func(*mocks.HTTPClient)
+		after     func(*LatestEstimate, error)
+	}{
+		{"route name", "PID",
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK("{}")
+				c.EXPECT().Do(mock.Anything).Run(func(req *http.Request) {
+					assert.Equal("/v1/payment/PID/update-merchant-estimate", req.URL.Path, "bad endpoint")
+				}).Return(resp, nil)
+
+			},
+			nil,
+		},
+		{"api error", "PID",
+			func(c *mocks.HTTPClient) {
+				c.EXPECT().Do(mock.Anything).Return(nil, errors.New("network error"))
+			}, func(e *LatestEstimate, err error) {
+				assert.Nil(e)
+				assert.Error(err)
+				assert.Equal("last-estimate: network error", err.Error())
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := mocks.NewHTTPClient(t)
+			core.UseClient(c)
+			if tt.init != nil {
+				tt.init(c)
+			}
+			got, err := RefreshEstimatedPrice(tt.paymentID)
+			if tt.after != nil {
+				tt.after(got, err)
+			}
+		})
+	}
+}

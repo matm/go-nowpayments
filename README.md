@@ -12,8 +12,9 @@ Topic|Endpoint|Implemented
 ||Get estimated price|:heavy_check_mark:
 ||Get the minimum payment amount|:heavy_check_mark:
 ||Get payment status|:heavy_check_mark:
-||Create payment|:heavy_check_mark:
 ||Get list of payments|:heavy_check_mark:
+||Get/Update payment estimate|:heavy_check_mark:
+||Create payment|:heavy_check_mark:
 [Currencies](https://documenter.getpostman.com/view/7907941/S1a32n38#cb80ccdc-8f7c-426c-89df-1ed2241954a5)||Yes
 ||Get available currencies|:heavy_check_mark:
 ||Get available checked currencies|:heavy_check_mark:

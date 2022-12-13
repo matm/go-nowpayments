@@ -39,3 +39,27 @@ func EstimatedPrice(amount float64, currencyFrom, currencyTo string) (*Estimate,
 	}
 	return e, nil
 }
+
+// LatestEstimate holds info about the last price estimation.
+type LatestEstimate struct {
+	PaymentID      string  `json:"id"`
+	TokenID        string  `json:"token_id"`
+	PayAmount      float64 `json:"pay_amount"`
+	ExpirationDate string  `json:"expiration_estimate_date"`
+}
+
+// RefreshEstimatedPrice gets the current estimate on the payment and update
+// the current estimate.
+func RefreshEstimatedPrice(paymentID string) (*LatestEstimate, error) {
+	e := &LatestEstimate{}
+	par := &core.SendParams{
+		RouteName: "last-estimate",
+		Into:      &e,
+		Path:      paymentID + "/update-merchant-estimate",
+	}
+	err := core.HTTPSend(par)
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
+}
