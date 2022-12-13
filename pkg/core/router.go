@@ -37,16 +37,17 @@ type routeAttr struct {
 }
 
 var routes map[string]routeAttr = map[string]routeAttr{
-	"status":              {http.MethodGet, "/status"},
+	"auth":                {http.MethodPost, "/auth"},
 	"currencies":          {http.MethodGet, "/currencies"},
 	"estimate":            {http.MethodGet, "/estimate"},
+	"invoice-create":      {http.MethodPost, "/invoice"},
 	"last-estimate":       {http.MethodPost, "/payment"},
 	"min-amount":          {http.MethodGet, "/min-amount"},
-	"payment-status":      {http.MethodGet, "/payment"},
-	"auth":                {http.MethodPost, "/auth"},
 	"payment-create":      {http.MethodPost, "/payment"},
+	"payment-status":      {http.MethodGet, "/payment"},
 	"payments-list":       {http.MethodGet, "/payment/"},
 	"selected-currencies": {http.MethodGet, "/merchant/coins"},
+	"status":              {http.MethodGet, "/status"},
 }
 
 var (

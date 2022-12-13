@@ -14,7 +14,6 @@ import (
 type PaymentAmount struct {
 	PriceAmount      float64 `json:"price_amount"`
 	PriceCurrency    string  `json:"price_currency"`
-	PayAmount        float64 `json:"pay_amount,omitempty"`
 	PayCurrency      string  `json:"pay_currency"`
 	CallbackURL      string  `json:"ipn_callback_url,omitempty"`
 	OrderID          string  `json:"order_id,omitempty"`
@@ -25,12 +24,13 @@ type PaymentAmount struct {
 type PaymentArgs struct {
 	PaymentAmount
 
-	FeePaidByUser  bool   `json:"is_fee_paid_by_user,omitempty"`
-	FixedRate      bool   `json:"fixed_rate,omitempty"`
-	PayoutAddress  string `json:"payout_address,omitempty"`
-	PayoutCurrency string `json:"payout_currency,omitempty"`
-	PayoutExtraID  string `json:"payout_extra_id,omitempty"`
-	PurchaseID     string `json:"purchase_id,omitempty"`
+	FeePaidByUser  bool    `json:"is_fee_paid_by_user,omitempty"`
+	FixedRate      bool    `json:"fixed_rate,omitempty"`
+	PayoutAddress  string  `json:"payout_address,omitempty"`
+	PayAmount      float64 `json:"pay_amount,omitempty"`
+	PayoutCurrency string  `json:"payout_currency,omitempty"`
+	PayoutExtraID  string  `json:"payout_extra_id,omitempty"`
+	PurchaseID     string  `json:"purchase_id,omitempty"`
 }
 
 // Payment holds payment related information once we get a response
