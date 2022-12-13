@@ -110,6 +110,24 @@ func TestRefreshEstimatedPrice(t *testing.T) {
 		init      func(*mocks.HTTPClient)
 		after     func(*LatestEstimate, error)
 	}{
+		{"missing payment ID", "", nil,
+			func(e *LatestEstimate, err error) {
+				assert.Nil(e)
+				assert.Error(err)
+			},
+		},
+		{"request OK", "PID",
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"id":"pid","pay_amount":11.5}`)
+				c.EXPECT().Do(mock.Anything).Return(resp, nil)
+			},
+			func(e *LatestEstimate, err error) {
+				assert.NotNil(e)
+				assert.NoError(err)
+				assert.Equal("pid", e.PaymentID)
+				assert.Equal(11.5, e.PayAmount)
+			},
+		},
 		{"route name", "PID",
 			func(c *mocks.HTTPClient) {
 				resp := newResponseOK("{}")

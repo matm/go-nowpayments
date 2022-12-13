@@ -1,6 +1,7 @@
 package payments
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -51,6 +52,9 @@ type LatestEstimate struct {
 // RefreshEstimatedPrice gets the current estimate on the payment and update
 // the current estimate.
 func RefreshEstimatedPrice(paymentID string) (*LatestEstimate, error) {
+	if paymentID == "" {
+		return nil, errors.New("missing paymentID")
+	}
 	e := &LatestEstimate{}
 	par := &core.SendParams{
 		RouteName: "last-estimate",
