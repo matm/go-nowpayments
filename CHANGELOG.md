@@ -1,4 +1,5 @@
 v 1.0.0
+  - Implement create payment from invoice. #15
   - Implement create invoice. #14
   - Implement get/update payment estimate. #16
   - Implement get available checked currencies. #12

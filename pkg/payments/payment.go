@@ -80,3 +80,37 @@ func New(pa *PaymentArgs) (*Payment, error) {
 	}
 	return p, nil
 }
+
+type InvoicePaymentArgs struct {
+	InvoiceID        string `json:"iid"`
+	PayCurrency      string `json:"pay_currency"`
+	PurchaseID       string `json:"purchase_id,omitempty"`
+	OrderDescription string `json:"order_description,omitempty"`
+	CustomerEmail    string `json:"customer_email,omitempty"`
+	PayoutCurrency   string `json:"payout_currency,omitempty"`
+	PayoutExtraID    string `json:"payout_extra_id,omitempty"`
+	PayoutAddress    string `json:"payout_address,omitempty"`
+}
+
+// NewFromInvoice creates a payment from an existing invoice. ID is the
+// invoice's identifier.
+func NewFromInvoice(ipa *InvoicePaymentArgs) (*Payment, error) {
+	if ipa == nil {
+		return nil, errors.New("nil invoice payment args")
+	}
+	d, err := json.Marshal(ipa)
+	if err != nil {
+		return nil, eris.Wrap(err, "payment from invoice args")
+	}
+	p := &Payment{}
+	par := &core.SendParams{
+		RouteName: "invoice-payment",
+		Into:      &p,
+		Body:      strings.NewReader(string(d)),
+	}
+	err = core.HTTPSend(par)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
+}

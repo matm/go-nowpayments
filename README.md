@@ -16,6 +16,7 @@ Topic|Endpoint|Implemented
 ||Get/Update payment estimate|:heavy_check_mark:
 ||Create invoice|:heavy_check_mark:
 ||Create payment|:heavy_check_mark:
+||Create payment from invoice|:heavy_check_mark:
 [Currencies](https://documenter.getpostman.com/view/7907941/S1a32n38#cb80ccdc-8f7c-426c-89df-1ed2241954a5)||Yes
 ||Get available currencies|:heavy_check_mark:
 ||Get available checked currencies|:heavy_check_mark:

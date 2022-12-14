@@ -33,6 +33,8 @@ func main() {
 	debug := flag.Bool("d", false, "turn debugging on")
 	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
 	newInvoice := flag.Bool("i", false, "new invoice")
+	newPaymentFromInvoice := flag.String("pi", "", "new payment from invoice ID")
+
 	flag.Parse()
 
 	if *debug {
@@ -122,6 +124,24 @@ func main() {
 		}
 		fmt.Printf("Creating a %.2f invoice ...\n", pa.PriceAmount)
 		pay, err := payments.NewInvoice(pa)
+		if err != nil {
+			log.Fatal(err)
+		}
+		d, err := json.Marshal(pay)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(d))
+		return
+	}
+
+	if *newPaymentFromInvoice != "" {
+		pa := &payments.InvoicePaymentArgs{
+			InvoiceID:   *newPaymentFromInvoice,
+			PayCurrency: "xmr",
+		}
+		fmt.Printf("Creating a payment from invoice %q...\n", pa.InvoiceID)
+		pay, err := payments.NewFromInvoice(pa)
 		if err != nil {
 			log.Fatal(err)
 		}
