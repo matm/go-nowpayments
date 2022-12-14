@@ -13,25 +13,22 @@ import (
 type InvoiceArgs struct {
 	PaymentAmount
 
-	FeePaidByUser  bool   `json:"is_fee_paid_by_user,omitempty"`
-	FixedRate      bool   `json:"fixed_rate,omitempty"`
-	PayoutAddress  string `json:"payout_address,omitempty"`
-	PayoutCurrency string `json:"payout_currency,omitempty"`
-	PayoutExtraID  string `json:"payout_extra_id,omitempty"`
-	PurchaseID     string `json:"purchase_id,omitempty"`
+	CancelURL  string `json:"cancel_url,omitempty"`
+	SuccessURL string `json:"success_url,omitempty"`
 }
 
 // Invoice describes an invoice. InvoiceURL is the URL to follow to
 // make the payment.
 type Invoice struct {
-	PaymentAmount
+	InvoiceArgs
 
-	ID         string `json:"id"`
-	UpdatedAt  string `json:"updated_at,omitempty"`
-	CreatedAt  string `json:"created_at,omitempty"`
-	SuccessURL string `json:"success_url,omitempty"`
-	CancelURL  string `json:"cancel_url,omitempty"`
-	InvoiceURL string `json:"invoice_url,omitempty"`
+	// FIXME: inconsistency on their side: should be a float64, like
+	// the field used for a payment.
+	PriceAmount string `json:"price_amount"`
+	ID          string `json:"id"`
+	CreatedAt   string `json:"created_at,omitempty"`
+	InvoiceURL  string `json:"invoice_url,omitempty"`
+	UpdatedAt   string `json:"updated_at,omitempty"`
 }
 
 // NewInvoice creates an invoice.
