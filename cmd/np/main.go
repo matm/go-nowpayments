@@ -28,10 +28,11 @@ func main() {
 
 	paymentID := flag.String("p", "", "status of payment ID")
 	newPayment := flag.Bool("n", false, "new payment")
-	payAmount := flag.Float64("a", 2.0, "pay amount for new payment")
+	payAmount := flag.Float64("a", 2.0, "pay amount for new payment/invoice")
 	listPayments := flag.Bool("l", false, "list all payments")
 	debug := flag.Bool("d", false, "turn debugging on")
 	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
+	newInvoice := flag.Bool("i", false, "new invoice")
 	flag.Parse()
 
 	if *debug {
@@ -96,6 +97,31 @@ func main() {
 		}
 		fmt.Printf("Creating a %.2f payment ...\n", pa.PriceAmount)
 		pay, err := payments.New(pa)
+		if err != nil {
+			log.Fatal(err)
+		}
+		d, err := json.Marshal(pay)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(d))
+		return
+	}
+
+	if *newInvoice {
+		pa := &payments.InvoiceArgs{
+			PaymentAmount: payments.PaymentAmount{
+				PriceAmount:      *payAmount,
+				PriceCurrency:    "eur",
+				PayCurrency:      "xmr",
+				OrderID:          "tool 1",
+				OrderDescription: "Some useful tool",
+			},
+			CancelURL:  "http://mycancel",
+			SuccessURL: "http://mysuccess",
+		}
+		fmt.Printf("Creating a %.2f invoice ...\n", pa.PriceAmount)
+		pay, err := payments.NewInvoice(pa)
 		if err != nil {
 			log.Fatal(err)
 		}
