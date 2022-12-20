@@ -1,6 +1,7 @@
 # NOWPayments Go Library
 
-[![godoc](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://pkg.go.dev/github.com/matm/go-nowpayments)
+[![Go Reference](https://pkg.go.dev/badge/github.com/matm/go-nowpayments.svg)](https://pkg.go.dev/github.com/matm/go-nowpayments)
+[![Go Report Card](https://goreportcard.com/badge/github.com/matm/go-nowpayments)](https://goreportcard.com/report/github.com/matm/go-nowpayments)
 
 This is an unofficial Go library for the [crypto NOWPayments API](https://documenter.getpostman.com/view/7907941/S1a32n38#84c51632-01ad-49c0-96f8-fb4b5ad2b24a) version 1.
 
@@ -31,7 +32,7 @@ Topic|Endpoint|Package.Method|Implemented
 ## Installation
 
 ```bash
-$ go get github.com/matm/go-nowpayments
+$ go get github.com/matm/go-nowpayments@v1.0.0
 ```
 
 ## CLI Tool
