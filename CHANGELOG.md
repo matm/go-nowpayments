@@ -1,3 +1,6 @@
+v 1.0.1
+  - Link methods to Go documentation. #22
+
 v 1.0.0
   - cmd/np: add -f flag to read config file. #20
   - Implement create payment from invoice. #15
