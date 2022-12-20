@@ -50,6 +50,8 @@ Usage of np:
         pay amount for new payment/invoice (default 2)
   -c    show list of selected currencies
   -d    turn debugging on
+  -f string
+        JSON config file to use
   -i    new invoice
   -l    list all payments
   -n    new payment

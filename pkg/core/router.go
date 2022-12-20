@@ -11,11 +11,12 @@ import (
 	"github.com/rotisserie/eris"
 )
 
-type baseURL string
+// BaseURL is the URL to NOWPayment's service.
+type BaseURL string
 
 const (
 	// ProductionBaseURL is the URL to the production service.
-	ProductionBaseURL baseURL = "https://api.nowpayments.io/v1"
+	ProductionBaseURL BaseURL = "https://api.nowpayments.io/v1"
 	// SandBoxBaseURL is the URL to the sandbox service.
 	SandBoxBaseURL = "https://api-sandbox.nowpayments.io/v1"
 )
@@ -52,7 +53,7 @@ var routes map[string]routeAttr = map[string]routeAttr{
 }
 
 var (
-	defaultURL baseURL = SandBoxBaseURL
+	defaultURL BaseURL = SandBoxBaseURL
 )
 
 var debug = false
@@ -63,13 +64,8 @@ func WithDebug(d bool) {
 }
 
 // UseBaseURL sets the base URL to use to connect to NOWPayment's API.
-func UseBaseURL(b baseURL) {
+func UseBaseURL(b BaseURL) {
 	defaultURL = b
-}
-
-// BaseURL returns the base URL used to connect to NOWPayment's API.
-func BaseURL() string {
-	return string(defaultURL)
 }
 
 // HTTPSend sends to endpoint with an optional request body and get the HTTP

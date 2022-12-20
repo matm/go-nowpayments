@@ -37,7 +37,7 @@ func newResponseOK(body string) *http.Response {
 func conf() *strings.Reader {
 	return strings.NewReader(`
 {
-	"login":"l","password":"p","apiKey":"key"
+	"login":"l","password":"p","apiKey":"key","server":"http://some.tld"
 }
 `)
 }
@@ -197,7 +197,7 @@ func TestWithDebug(t *testing.T) {
 
 func TestUseBaseURL(t *testing.T) {
 	type args struct {
-		b baseURL
+		b BaseURL
 	}
 	tests := []struct {
 		name  string
@@ -213,23 +213,6 @@ func TestUseBaseURL(t *testing.T) {
 			UseBaseURL(tt.args.b)
 			if tt.after != nil {
 				tt.after()
-			}
-		})
-	}
-}
-
-func TestBaseURL(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		{"get url", "this"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			UseBaseURL(baseURL("this"))
-			if got := BaseURL(); got != tt.want {
-				t.Errorf("BaseURL() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -1,4 +1,5 @@
 v 1.0.0
+  - cmd/np: add -f flag to read config file. #20
   - Implement create payment from invoice. #15
   - Implement create invoice. #14
   - Implement get/update payment estimate. #16
