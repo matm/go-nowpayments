@@ -30,28 +30,13 @@ jobs:
     - name: Test
       run: make test
 
-    - name: Compute code coverage
+    - name: Code coverage
       run: |
-        go test -v -cover ./... -coverprofile coverage.out -coverpkg ./...
-        go tool cover -func coverage.out -o coverage.out
-
-    - name: Go Coverage Badge
-      uses: tj-actions/coverage-badge-go@v1
-      with:
-        green: 80
-        filename: coverage.out
-
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      id: auto-commit-action
-      with:
-        commit_message: Apply Code Coverage Badge
-        skip_fetch: true
-        skip_checkout: true
-        file_pattern: ./README.md
-
-    - name: Push Changes
-      if: steps.auto-commit-action.outputs.changes_detected == 'true'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ github.token }}
-        branch: ${{ github.ref }}
+        curl https://uploader.codecov.io/verification.gpg | gpg --no-default-keyring --keyring trustedkeys.gpg --import # One-time step
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
+        curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
+        curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig
+        gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+        shasum -a 256 -c codecov.SHA256SUM
+        chmod +x codecov
+        ./codecov
