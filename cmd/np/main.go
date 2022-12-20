@@ -14,18 +14,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open("conf.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	err = config.Load(f)
-	if err != nil {
-		log.Fatal(err)
-	}
-	core.UseBaseURL(core.SandBoxBaseURL)
-	core.UseClient(core.NewHTTPClient())
-
+	cfgFile := flag.String("f", "", "JSON config file to use")
 	paymentID := flag.String("p", "", "status of payment ID")
 	newPayment := flag.Bool("n", false, "new payment")
 	payAmount := flag.Float64("a", 2.0, "pay amount for new payment/invoice")
@@ -36,6 +25,21 @@ func main() {
 	newPaymentFromInvoice := flag.String("pi", "", "new payment from invoice ID")
 
 	flag.Parse()
+
+	if *cfgFile == "" {
+		log.Fatal("please specify a JSON config file with -f")
+	}
+	f, err := os.Open(*cfgFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	err = config.Load(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+	core.UseBaseURL(core.BaseURL(config.Server()))
+	core.UseClient(core.NewHTTPClient())
 
 	if *debug {
 		core.WithDebug(true)
@@ -54,25 +58,25 @@ func main() {
 		return
 	}
 
-	fmt.Println("Sandbox:", core.BaseURL() == core.SandBoxBaseURL)
+	fmt.Fprintln(os.Stderr, "Sandbox:", config.Server() == core.SandBoxBaseURL)
 	st, err := core.Status()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("API Status:", st)
+	fmt.Fprintln(os.Stderr, "API Status:", st)
 
 	if *showCurrencies {
 		cs, err := currencies.Selected()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%d selected (checked) crypto currencies: %v\n", len(cs), cs)
+		fmt.Fprintf(os.Stderr, "%d selected (checked) crypto currencies: %v\n", len(cs), cs)
 		return
 	}
 
 	if *listPayments {
 		limit := 5
-		fmt.Printf("Showing last %d payments only:\n", limit)
+		fmt.Fprintf(os.Stderr, "Showing last %d payments only:\n", limit)
 		all, err := payments.List(&payments.ListOption{
 			Limit: limit,
 		})
@@ -97,7 +101,7 @@ func main() {
 				OrderDescription: "Some useful tool",
 			},
 		}
-		fmt.Printf("Creating a %.2f payment ...\n", pa.PriceAmount)
+		fmt.Fprintf(os.Stderr, "Creating a %.2f payment ...\n", pa.PriceAmount)
 		pay, err := payments.New(pa)
 		if err != nil {
 			log.Fatal(err)
@@ -122,7 +126,7 @@ func main() {
 			CancelURL:  "http://mycancel",
 			SuccessURL: "http://mysuccess",
 		}
-		fmt.Printf("Creating a %.2f invoice ...\n", pa.PriceAmount)
+		fmt.Fprintf(os.Stderr, "Creating a %.2f invoice ...\n", pa.PriceAmount)
 		pay, err := payments.NewInvoice(pa)
 		if err != nil {
 			log.Fatal(err)
@@ -140,7 +144,7 @@ func main() {
 			InvoiceID:   *newPaymentFromInvoice,
 			PayCurrency: "xmr",
 		}
-		fmt.Printf("Creating a payment from invoice %q...\n", pa.InvoiceID)
+		fmt.Fprintf(os.Stderr, "Creating a payment from invoice %q...\n", pa.InvoiceID)
 		pay, err := payments.NewFromInvoice(pa)
 		if err != nil {
 			log.Fatal(err)
