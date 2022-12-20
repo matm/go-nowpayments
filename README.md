@@ -6,27 +6,27 @@ This is an unofficial Go library for the [crypto NOWPayments API](https://docume
 
 Note that the current implementation mostly focuses on the payments API for now:
 
-Topic|Endpoint|Implemented
----|:---|:---:
-[Recurring payments](https://documenter.getpostman.com/view/7907941/S1a32n38#689df54e-9f43-42b3-bfe8-9bcca0444a6a)||No
-[Billing (sub-partner)](https://documenter.getpostman.com/view/7907941/S1a32n38#a523b89b-40b7-4afe-b940-043d434a6c80)||No
-[Payments](https://documenter.getpostman.com/view/7907941/S1a32n38#84c51632-01ad-49c0-96f8-fb4b5ad2b24a)||Yes
-||Get estimated price|:heavy_check_mark:
-||Get the minimum payment amount|:heavy_check_mark:
-||Get payment status|:heavy_check_mark:
-||Get list of payments|:heavy_check_mark:
-||Get/Update payment estimate|:heavy_check_mark:
-||Create invoice|:heavy_check_mark:
-||Create payment|:heavy_check_mark:
-||Create payment from invoice|:heavy_check_mark:
-[Currencies](https://documenter.getpostman.com/view/7907941/S1a32n38#cb80ccdc-8f7c-426c-89df-1ed2241954a5)||Yes
-||Get available currencies|:heavy_check_mark:
-||Get available checked currencies|:heavy_check_mark:
-[Payouts](https://documenter.getpostman.com/view/7907941/S1a32n38#138ee72b-4c4f-40d0-a565-4a1e907f4d94)||No
-[API status](https://documenter.getpostman.com/view/7907941/S1a32n38#9998079f-dcc8-4e07-9ac7-3d52f0fd733a)||Yes
-||Get API status|:heavy_check_mark:
-[Authentication](https://documenter.getpostman.com/view/7907941/S1a32n38#174cd8c5-5973-4be7-9213-05567f8adf27)||Yes
-||Authentication|:heavy_check_mark:
+Topic|Endpoint|Package.Method|Implemented
+---|:---|:---|:---:
+[Recurring payments](https://documenter.getpostman.com/view/7907941/S1a32n38#689df54e-9f43-42b3-bfe8-9bcca0444a6a)|||No
+[Billing (sub-partner)](https://documenter.getpostman.com/view/7907941/S1a32n38#a523b89b-40b7-4afe-b940-043d434a6c80)|||No
+[Payments](https://documenter.getpostman.com/view/7907941/S1a32n38#84c51632-01ad-49c0-96f8-fb4b5ad2b24a)|||Yes
+||Get estimated price|[payments.EstimatedPrice(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#EstimatedPrice)|:heavy_check_mark:
+||Get the minimum payment amount|[payments.MinimumAmount(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#MinimumAmount)|:heavy_check_mark:
+||Get payment status|[payments.Status()](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#Status)|:heavy_check_mark:
+||Get list of payments|[payments.List(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#List)|:heavy_check_mark:
+||Get/Update payment estimate|[payments.RefreshEstimatedPrice(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#RefreshEstimatedPrice)|:heavy_check_mark:
+||Create invoice|[payments.NewInvoice(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#NewInvoice)|:heavy_check_mark:
+||Create payment|[payments.New(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#New)|:heavy_check_mark:
+||Create payment from invoice|[payments.NewFromInvoice(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/payments#NewFromInvoice)|:heavy_check_mark:
+[Currencies](https://documenter.getpostman.com/view/7907941/S1a32n38#cb80ccdc-8f7c-426c-89df-1ed2241954a5)|||Yes
+||Get available currencies|[currencies.All()](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/currencies#All)|:heavy_check_mark:
+||Get available checked currencies|[currencies.Selected()](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/currencies#Selected)|:heavy_check_mark:
+[Payouts](https://documenter.getpostman.com/view/7907941/S1a32n38#138ee72b-4c4f-40d0-a565-4a1e907f4d94)|||No
+[API status](https://documenter.getpostman.com/view/7907941/S1a32n38#9998079f-dcc8-4e07-9ac7-3d52f0fd733a)|||Yes
+||Get API status|[core.Status()](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/core#Status)|:heavy_check_mark:
+[Authentication](https://documenter.getpostman.com/view/7907941/S1a32n38#174cd8c5-5973-4be7-9213-05567f8adf27)|||Yes
+||Authentication|[core.Authenticate(...)](https://pkg.go.dev/github.com/matm/go-nowpayments/pkg/core#Authenticate)|:heavy_check_mark:
 
 ## Installation
 
