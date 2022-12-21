@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/matm/go-nowpayments.svg)](https://pkg.go.dev/github.com/matm/go-nowpayments)
 [![Go Report Card](https://goreportcard.com/badge/github.com/matm/go-nowpayments)](https://goreportcard.com/report/github.com/matm/go-nowpayments)
+[![codecov](https://codecov.io/gh/matm/go-nowpayments/branch/main/graph/badge.svg?token=AP16BAZR68)](https://codecov.io/gh/matm/go-nowpayments)
 
 This is an unofficial Go library for the [crypto NOWPayments API](https://documenter.getpostman.com/view/7907941/S1a32n38#84c51632-01ad-49c0-96f8-fb4b5ad2b24a) version 1.
 
