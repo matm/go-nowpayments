@@ -1,7 +1,7 @@
 package currencies
 
 import (
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/core"
 )
 
 // All returns a list of all supported cryptocurrencies.

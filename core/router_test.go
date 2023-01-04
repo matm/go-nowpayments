@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/matm/go-nowpayments/mocks"
-	"github.com/matm/go-nowpayments/pkg/config"
+	"github.com/matm/go-nowpayments/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

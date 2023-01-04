@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/core"
 	"github.com/rotisserie/eris"
 )
 

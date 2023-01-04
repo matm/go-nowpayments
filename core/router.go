@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/matm/go-nowpayments/pkg/config"
+	"github.com/matm/go-nowpayments/config"
 	"github.com/rotisserie/eris"
 )
 
