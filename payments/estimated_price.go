@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/core"
 	"github.com/rotisserie/eris"
 )
 

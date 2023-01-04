@@ -10,4 +10,4 @@ test: mocks
 	@go test ./...
 
 clean:
-	@rm -f np && rm -rf mocks
+	@rm -f np

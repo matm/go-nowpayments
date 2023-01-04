@@ -3,7 +3,7 @@ package payments
 import (
 	"net/url"
 
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/core"
 )
 
 // CurrencyAmount has info about minimum payment amount for a specific pair.

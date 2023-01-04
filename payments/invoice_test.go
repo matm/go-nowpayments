@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/matm/go-nowpayments/mocks"
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

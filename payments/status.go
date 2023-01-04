@@ -1,8 +1,8 @@
 package payments
 
 import (
-	"github.com/matm/go-nowpayments/pkg/config"
-	"github.com/matm/go-nowpayments/pkg/core"
+	"github.com/matm/go-nowpayments/config"
+	"github.com/matm/go-nowpayments/core"
 	"github.com/rotisserie/eris"
 )
 
