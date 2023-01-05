@@ -18,6 +18,7 @@ func main() {
 	paymentID := flag.String("p", "", "status of payment ID")
 	newPayment := flag.Bool("n", false, "new payment")
 	payAmount := flag.Float64("a", 2.0, "pay amount for new payment/invoice")
+	payCurrency := flag.String("pc", "xmr", "crypto currency to pay in")
 	listPayments := flag.Bool("l", false, "list all payments")
 	debug := flag.Bool("d", false, "turn debugging on")
 	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
@@ -96,7 +97,7 @@ func main() {
 			PaymentAmount: payments.PaymentAmount{
 				PriceAmount:      *payAmount,
 				PriceCurrency:    "eur",
-				PayCurrency:      "xmr",
+				PayCurrency:      *payCurrency,
 				OrderID:          "tool 1",
 				OrderDescription: "Some useful tool",
 			},

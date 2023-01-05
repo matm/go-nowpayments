@@ -51,6 +51,8 @@ type Payment struct {
 	Network                string  `json:"network"`
 	NetworkPrecision       int     `json:"network_precision"`
 	PayAddress             string  `json:"pay_address"`
+	PayAmount              float64 `json:"pay_amount"`
+	PayCurrency            string  `json:"pay_currency"`
 	PayinExtraID           string  `json:"payin_extra_id"`
 	PurchaseID             string  `json:"purchase_id"`
 	SmartContract          string  `json:"smart_contract"`
