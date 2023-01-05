@@ -1,4 +1,7 @@
 v 1.0.1
+  - payment: missing PayAmount and PayCurrency fields. #30
+
+v 1.0.1
   - Explicitely add mocks directory and remove pkg package. #28
   - Add Go report card to README. #24
   - Link methods to Go documentation. #22
