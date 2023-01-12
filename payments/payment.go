@@ -24,13 +24,27 @@ type PaymentAmount struct {
 type PaymentArgs struct {
 	PaymentAmount
 
-	FeePaidByUser  bool    `json:"is_fee_paid_by_user,omitempty"`
-	FixedRate      bool    `json:"fixed_rate,omitempty"`
-	PayoutAddress  string  `json:"payout_address,omitempty"`
-	PayAmount      float64 `json:"pay_amount,omitempty"`
-	PayoutCurrency string  `json:"payout_currency,omitempty"`
-	PayoutExtraID  string  `json:"payout_extra_id,omitempty"`
-	PurchaseID     string  `json:"purchase_id,omitempty"`
+	// FeePaidByUser is optional, required for fixed-rate exchanges with all fees paid by users.
+	FeePaidByUser bool `json:"is_fee_paid_by_user,omitempty"`
+	// FixedRate is optional, required for fixed-rate exchanges.
+	FixedRate bool `json:"fixed_rate,omitempty"`
+	// PayoutAddress is optional, usually the funds will go to the address you specify in
+	// your personal account. In case you want to receive funds on another address, you can specify
+	// it in this parameter.
+	PayoutAddress string `json:"payout_address,omitempty"`
+	// PayAmount is optional, the amount that users have to pay for the order stated in crypto.
+	// You can either specify it yourself, or we will automatically convert the amount indicated
+	// in price_amount.
+	PayAmount float64 `json:"pay_amount,omitempty"`
+	// PayoutCurrency for the cryptocurrency name.
+	PayoutCurrency string `json:"payout_currency,omitempty"`
+	// PayoutExtraID is optional, extra id or memo or tag for external payout_address.
+	PayoutExtraID string `json:"payout_extra_id,omitempty"`
+	// PurchaseID is optional, id of purchase for which you want to create another
+	// payment, only used for several payments for one order.
+	PurchaseID string `json:"purchase_id,omitempty"`
+	// optional, case which you want to test (sandbox only).
+	Case string `json:"case,omitempty"`
 }
 
 // Payment holds payment related information once we get a response
