@@ -1,3 +1,6 @@
+v 1.0.2
+  - sandbox: add support for optional case for new payments. #32
+
 v 1.0.1
   - payment: missing PayAmount and PayCurrency fields. #30
 

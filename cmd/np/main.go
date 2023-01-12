@@ -24,6 +24,7 @@ func main() {
 	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
 	newInvoice := flag.Bool("i", false, "new invoice")
 	newPaymentFromInvoice := flag.String("pi", "", "new payment from invoice ID")
+	pcase := flag.String("case", "success", "payment's case (sandbox only)")
 
 	flag.Parse()
 
@@ -101,6 +102,9 @@ func main() {
 				OrderID:          "tool 1",
 				OrderDescription: "Some useful tool",
 			},
+		}
+		if config.Server() == core.SandBoxBaseURL {
+			pa.Case = *pcase
 		}
 		fmt.Fprintf(os.Stderr, "Creating a %.2f payment ...\n", pa.PriceAmount)
 		pay, err := payments.New(pa)
