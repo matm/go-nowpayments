@@ -95,7 +95,7 @@ func New(pa *PaymentArgs) (*Payment, error) {
 		return nil, eris.Wrap(err, "payment args")
 	}
 	var p interface{}
-	// Ugly hack but required for the moment :(
+	// Ugly hack but required at the moment :(
 	if config.Server() == string(core.ProductionBaseURL) {
 		p = &PaymentProd{}
 	} else {
