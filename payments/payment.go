@@ -3,8 +3,10 @@ package payments
 import (
 	"encoding/json"
 	"errors"
+	"strconv"
 	"strings"
 
+	"github.com/matm/go-nowpayments/config"
 	"github.com/matm/go-nowpayments/core"
 	"github.com/rotisserie/eris"
 )
@@ -75,6 +77,14 @@ type Payment struct {
 	UpdatedAt              string  `json:"updated_at"`
 }
 
+// PaymentProd is an ugly hack. This is because the production env returns a string for `pay_amount`
+// whereas the sandbox env returns a float64 :(
+// Hopefully they will fix this soon.
+type PaymentProd struct {
+	Payment
+	PayAmount string `json:"pay_amount"`
+}
+
 // New creates a payment.
 func New(pa *PaymentArgs) (*Payment, error) {
 	if pa == nil {
@@ -84,7 +94,13 @@ func New(pa *PaymentArgs) (*Payment, error) {
 	if err != nil {
 		return nil, eris.Wrap(err, "payment args")
 	}
-	p := &Payment{}
+	var p interface{}
+	// Ugly hack but required at the moment :(
+	if config.Server() == string(core.ProductionBaseURL) {
+		p = &PaymentProd{}
+	} else {
+		p = &Payment{}
+	}
 	par := &core.SendParams{
 		RouteName: "payment-create",
 		Into:      &p,
@@ -94,7 +110,38 @@ func New(pa *PaymentArgs) (*Payment, error) {
 	if err != nil {
 		return nil, err
 	}
-	return p, nil
+	// Ugly hack continuing ...
+	var pv *Payment
+	switch p.(type) {
+	case *Payment:
+		pv = p.(*Payment)
+	case *PaymentProd:
+		j := p.(*PaymentProd)
+		pv = &Payment{
+			ID:                     j.ID,
+			AmountReceived:         j.AmountReceived,
+			BurningPercent:         j.BurningPercent,
+			CreatedAt:              j.CreatedAt,
+			ExpirationEstimateDate: j.ExpirationEstimateDate,
+			Network:                j.Network,
+			NetworkPrecision:       j.NetworkPrecision,
+			PayAddress:             j.PayAddress,
+			PayCurrency:            j.PayCurrency,
+			PayinExtraID:           j.PayinExtraID,
+			PurchaseID:             j.PurchaseID,
+			SmartContract:          j.SmartContract,
+			Status:                 j.Status,
+			TimeLimit:              j.TimeLimit,
+			UpdatedAt:              j.UpdatedAt,
+		}
+		// Now convert the `pay_amount`.
+		pm, err := strconv.ParseFloat(j.PayAmount, 64)
+		if err != nil {
+			return nil, eris.Wrap(err, "pay_amount hack convert")
+		}
+		pv.PayAmount = pm
+	}
+	return pv, nil
 }
 
 type InvoicePaymentArgs struct {
