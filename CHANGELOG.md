@@ -1,3 +1,6 @@
+v 1.0.3
+  - Unmarshal error on payment creation in production environment. #34
+
 v 1.0.2
   - sandbox: add support for optional case for new payments. #32
   - payment: missing PayAmount and PayCurrency fields. #30
