@@ -3,16 +3,20 @@ package payments
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"testing"
 
-	"github.com/matm/go-nowpayments/mocks"
+	"github.com/matm/go-nowpayments/config"
 	"github.com/matm/go-nowpayments/core"
+	"github.com/matm/go-nowpayments/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
+	require := require.New(t)
 	tests := []struct {
 		name  string
 		pa    *PaymentArgs
@@ -45,6 +49,43 @@ func TestNew(t *testing.T) {
 				assert.NoError(err)
 				assert.NotNil(p)
 				assert.Equal("1234", p.ID)
+			},
+		},
+		{"hack check", &PaymentArgs{
+			PurchaseID:    "1234",
+			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
+		},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"payment_id":"1234","pay_amount":"3.5"}`)
+				c.EXPECT().Do(mock.Anything).Return(resp, nil)
+				// Forces the detection of the production environment.
+				err := config.Load(strings.NewReader(`{"server":"https://api.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
+				require.NoError(err)
+			}, func(p *Payment, err error) {
+				assert.NoError(err)
+				assert.NotNil(p)
+				assert.Equal("1234", p.ID)
+				assert.Equal(3.5, p.PayAmount)
+				// Restore env.
+				err = config.Load(strings.NewReader(`{"server":"https://api-sandbox.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
+				require.NoError(err)
+			},
+		},
+		{"hack check, empty pay amount", &PaymentArgs{
+			PurchaseID:    "1234",
+			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
+		},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"payment_id":"1234"}`)
+				c.EXPECT().Do(mock.Anything).Return(resp, nil)
+				// Forces the detection of the production environment.
+				err := config.Load(strings.NewReader(`{"server":"https://api.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
+				require.NoError(err)
+			}, func(p *Payment, err error) {
+				assert.Error(err)
+				// Restore env.
+				err = config.Load(strings.NewReader(`{"server":"https://api-sandbox.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
+				require.NoError(err)
 			},
 		},
 		{"route check", &PaymentArgs{},
