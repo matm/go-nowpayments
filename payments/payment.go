@@ -3,10 +3,10 @@ package payments
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/matm/go-nowpayments/config"
 	"github.com/matm/go-nowpayments/core"
 	"github.com/rotisserie/eris"
 )
@@ -77,12 +77,78 @@ type Payment struct {
 	UpdatedAt              string  `json:"updated_at"`
 }
 
-// PaymentProd is an ugly hack. This is because the production env returns a string for `pay_amount`
-// whereas the sandbox env returns a float64 :(
-// Hopefully they will fix this soon.
-type PaymentProd struct {
-	Payment
-	PayAmount string `json:"pay_amount"`
+// UnmarshalJSON provides custom unmarshalling to the Payment struct so it
+// can work it all known cases.
+// This is to prevent 2 inconsistencies where their API returns:
+// ID as an int (after "list payments" call) or a string (after "create payment" call)
+// PayAmount as a string or a float64 (difference betwwen prod and sandbox APIs).
+func (p *Payment) UnmarshalJSON(b []byte) error {
+	type sp struct {
+		PaymentAmount
+
+		ID                     interface{} `json:"payment_id"`
+		AmountReceived         float64     `json:"amount_received"`
+		BurningPercent         int         `json:"burning_percent"`
+		CreatedAt              string      `json:"created_at"`
+		ExpirationEstimateDate string      `json:"expiration_estimate_date"`
+		Network                string      `json:"network"`
+		NetworkPrecision       int         `json:"network_precision"`
+		PayAddress             string      `json:"pay_address"`
+		PayAmount              interface{} `json:"pay_amount"`
+		PayCurrency            string      `json:"pay_currency"`
+		PayinExtraID           string      `json:"payin_extra_id"`
+		PurchaseID             string      `json:"purchase_id"`
+		SmartContract          string      `json:"smart_contract"`
+		Status                 string      `json:"payment_status"`
+		TimeLimit              string      `json:"time_limit"`
+		UpdatedAt              string      `json:"updated_at"`
+	}
+	j := sp{}
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return eris.Wrap(err, "payment custom unmarshal")
+	}
+	z := Payment{
+		PaymentAmount:          j.PaymentAmount,
+		AmountReceived:         j.AmountReceived,
+		BurningPercent:         j.BurningPercent,
+		CreatedAt:              j.CreatedAt,
+		ExpirationEstimateDate: j.ExpirationEstimateDate,
+		Network:                j.Network,
+		NetworkPrecision:       j.NetworkPrecision,
+		PayAddress:             j.PayAddress,
+		PayCurrency:            j.PayCurrency,
+		PayinExtraID:           j.PayinExtraID,
+		PurchaseID:             j.PurchaseID,
+		SmartContract:          j.SmartContract,
+		Status:                 j.Status,
+		TimeLimit:              j.TimeLimit,
+		UpdatedAt:              j.UpdatedAt,
+	}
+	switch j.PayAmount.(type) {
+	case string:
+		pa, err := strconv.ParseFloat(j.PayAmount.(string), 64)
+		if err != nil {
+			return eris.Wrap(err, "parsing pay_amount as a float")
+		}
+		z.PayAmount = pa
+	case float64:
+		z.PayAmount = j.PayAmount.(float64)
+	default:
+		// Any other type (including nil) converts to a zero value,
+		// which is the default. Do nothing.
+	}
+	switch j.ID.(type) {
+	case string:
+		z.ID = j.ID.(string)
+	case float64:
+		z.ID = fmt.Sprintf("%d", int(j.ID.(float64)))
+	default:
+		// Any other type converts to the default value for the type.
+		// Do nothing.
+	}
+	*p = z
+	return nil
 }
 
 // New creates a payment.
@@ -94,13 +160,7 @@ func New(pa *PaymentArgs) (*Payment, error) {
 	if err != nil {
 		return nil, eris.Wrap(err, "payment args")
 	}
-	var p interface{}
-	// Ugly hack but required at the moment :(
-	if config.Server() == string(core.ProductionBaseURL) {
-		p = &PaymentProd{}
-	} else {
-		p = &Payment{}
-	}
+	p := &Payment{}
 	par := &core.SendParams{
 		RouteName: "payment-create",
 		Into:      &p,
@@ -110,38 +170,7 @@ func New(pa *PaymentArgs) (*Payment, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Ugly hack continuing ...
-	var pv *Payment
-	switch p.(type) {
-	case *Payment:
-		pv = p.(*Payment)
-	case *PaymentProd:
-		j := p.(*PaymentProd)
-		pv = &Payment{
-			ID:                     j.ID,
-			AmountReceived:         j.AmountReceived,
-			BurningPercent:         j.BurningPercent,
-			CreatedAt:              j.CreatedAt,
-			ExpirationEstimateDate: j.ExpirationEstimateDate,
-			Network:                j.Network,
-			NetworkPrecision:       j.NetworkPrecision,
-			PayAddress:             j.PayAddress,
-			PayCurrency:            j.PayCurrency,
-			PayinExtraID:           j.PayinExtraID,
-			PurchaseID:             j.PurchaseID,
-			SmartContract:          j.SmartContract,
-			Status:                 j.Status,
-			TimeLimit:              j.TimeLimit,
-			UpdatedAt:              j.UpdatedAt,
-		}
-		// Now convert the `pay_amount`.
-		pm, err := strconv.ParseFloat(j.PayAmount, 64)
-		if err != nil {
-			return nil, eris.Wrap(err, "pay_amount hack convert")
-		}
-		pv.PayAmount = pm
-	}
-	return pv, nil
+	return p, nil
 }
 
 type InvoicePaymentArgs struct {

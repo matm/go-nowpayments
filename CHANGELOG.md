@@ -1,3 +1,6 @@
+v 1.0.4
+  - Remove hacks for pay_amount and payment_id with custom unmarshalling. #36
+
 v 1.0.3
   - Unmarshal error on payment creation in production environment. #34
 

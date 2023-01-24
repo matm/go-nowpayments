@@ -33,7 +33,7 @@ Topic|Endpoint|Package.Method|Implemented
 ## Installation
 
 ```bash
-$ go get github.com/matm/go-nowpayments@v1.0.3
+$ go get github.com/matm/go-nowpayments@v1.0.4
 ```
 
 ## CLI Tool

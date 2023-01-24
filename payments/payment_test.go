@@ -3,20 +3,16 @@ package payments
 import (
 	"errors"
 	"net/http"
-	"strings"
 	"testing"
 
-	"github.com/matm/go-nowpayments/config"
 	"github.com/matm/go-nowpayments/core"
 	"github.com/matm/go-nowpayments/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNew(t *testing.T) {
 	assert := assert.New(t)
-	require := require.New(t)
 	tests := []struct {
 		name  string
 		pa    *PaymentArgs
@@ -49,43 +45,57 @@ func TestNew(t *testing.T) {
 				assert.NoError(err)
 				assert.NotNil(p)
 				assert.Equal("1234", p.ID)
+				t.Logf("%+v", p)
 			},
 		},
-		{"hack check", &PaymentArgs{
+		{"pay_amount as a string", &PaymentArgs{
 			PurchaseID:    "1234",
 			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
 		},
 			func(c *mocks.HTTPClient) {
 				resp := newResponseOK(`{"payment_id":"1234","pay_amount":"3.5"}`)
 				c.EXPECT().Do(mock.Anything).Return(resp, nil)
-				// Forces the detection of the production environment.
-				err := config.Load(strings.NewReader(`{"server":"https://api.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
-				require.NoError(err)
 			}, func(p *Payment, err error) {
 				assert.NoError(err)
 				assert.NotNil(p)
 				assert.Equal("1234", p.ID)
 				assert.Equal(3.5, p.PayAmount)
-				// Restore env.
-				err = config.Load(strings.NewReader(`{"server":"https://api-sandbox.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
-				require.NoError(err)
 			},
 		},
-		{"hack check, empty pay amount", &PaymentArgs{
+		{"pay_amount as a float", &PaymentArgs{
+			PurchaseID:    "1234",
+			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
+		},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"payment_id":"1234","pay_amount":4.2}`)
+				c.EXPECT().Do(mock.Anything).Return(resp, nil)
+			}, func(p *Payment, err error) {
+				assert.NoError(err)
+				assert.NotNil(p)
+				assert.Equal("1234", p.ID)
+				assert.Equal(4.2, p.PayAmount)
+			},
+		},
+		{"pay_amount as an integer, who knows...", &PaymentArgs{
+			PurchaseID:    "1234",
+			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
+		},
+			func(c *mocks.HTTPClient) {
+				resp := newResponseOK(`{"payment_id":"1234","pay_amount":100}`)
+				c.EXPECT().Do(mock.Anything).Return(resp, nil)
+			}, func(p *Payment, err error) {
+				assert.NoError(err)
+			},
+		},
+		{"missing pay_amount value", &PaymentArgs{
 			PurchaseID:    "1234",
 			PaymentAmount: PaymentAmount{PriceAmount: 10.0},
 		},
 			func(c *mocks.HTTPClient) {
 				resp := newResponseOK(`{"payment_id":"1234"}`)
 				c.EXPECT().Do(mock.Anything).Return(resp, nil)
-				// Forces the detection of the production environment.
-				err := config.Load(strings.NewReader(`{"server":"https://api.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
-				require.NoError(err)
 			}, func(p *Payment, err error) {
-				assert.Error(err)
-				// Restore env.
-				err = config.Load(strings.NewReader(`{"server":"https://api-sandbox.nowpayments.io/v1","apiKey":"a","login":"l","password":"p"}`))
-				require.NoError(err)
+				assert.NoError(err)
 			},
 		},
 		{"route check", &PaymentArgs{},
