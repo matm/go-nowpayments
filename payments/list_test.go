@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/matm/go-nowpayments/mocks"
 	"github.com/matm/go-nowpayments/core"
+	"github.com/matm/go-nowpayments/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -18,7 +18,7 @@ func TestList(t *testing.T) {
 		name  string
 		o     *ListOption
 		init  func(*mocks.HTTPClient)
-		after func([]*PaymentHack, error)
+		after func([]*Payment, error)
 	}{
 		{"route and response", nil,
 			func(c *mocks.HTTPClient) {
@@ -28,16 +28,39 @@ func TestList(t *testing.T) {
 						case "/v1/auth":
 							return newResponseOK(`{"token":"tok"}`)
 						case "/v1/payment/":
-							return newResponseOK(`{"data":[{"payment_id":1}]}`)
+							return newResponseOK(`[{"payment_id":1}]`)
 						default:
 							t.Fatalf("unexpected route call %q", req.URL.Path)
 						}
 						return nil
 					}, nil)
 			},
-			func(ps []*PaymentHack, err error) {
+			func(ps []*Payment, err error) {
 				assert.NoError(err)
-				assert.Len(ps, 1)
+				if assert.Len(ps, 1) {
+					assert.Equal("1", ps[0].ID)
+				}
+			}},
+		{"payment_id as a string", nil,
+			func(c *mocks.HTTPClient) {
+				c.EXPECT().Do(mock.Anything).Call.Return(
+					func(req *http.Request) *http.Response {
+						switch req.URL.Path {
+						case "/v1/auth":
+							return newResponseOK(`{"token":"tok"}`)
+						case "/v1/payment/":
+							return newResponseOK(`[{"payment_id":"54321"}]`)
+						default:
+							t.Fatalf("unexpected route call %q", req.URL.Path)
+						}
+						return nil
+					}, nil)
+			},
+			func(ps []*Payment, err error) {
+				assert.NoError(err)
+				if assert.Len(ps, 1) {
+					assert.Equal("54321", ps[0].ID)
+				}
 			}},
 		{"api error", nil,
 			func(c *mocks.HTTPClient) {
@@ -62,7 +85,7 @@ func TestList(t *testing.T) {
 			func(c *mocks.HTTPClient) {
 				c.EXPECT().Do(mock.Anything).Return(nil, errors.New("bad credentials"))
 			},
-			func(ps []*PaymentHack, err error) {
+			func(ps []*Payment, err error) {
 				assert.Nil(ps)
 				assert.Error(err)
 				assert.Equal("list: auth: bad credentials", err.Error())

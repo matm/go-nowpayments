@@ -3,6 +3,7 @@ package payments
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -76,11 +77,16 @@ type Payment struct {
 	UpdatedAt              string  `json:"updated_at"`
 }
 
+// UnmarshalJSON provides custom unmarshalling to the Payment struct so it
+// can work it all known cases.
+// This is to prevent 2 inconsistencies where their API returns:
+// ID as an int (after "list payments" call) or a string (after "create payment" call)
+// PayAmount as a string or a float64 (difference betwwen prod and sandbox APIs).
 func (p *Payment) UnmarshalJSON(b []byte) error {
 	type sp struct {
 		PaymentAmount
 
-		ID                     string      `json:"payment_id"`
+		ID                     interface{} `json:"payment_id"`
 		AmountReceived         float64     `json:"amount_received"`
 		BurningPercent         int         `json:"burning_percent"`
 		CreatedAt              string      `json:"created_at"`
@@ -104,7 +110,6 @@ func (p *Payment) UnmarshalJSON(b []byte) error {
 	}
 	z := Payment{
 		PaymentAmount:          j.PaymentAmount,
-		ID:                     j.ID,
 		AmountReceived:         j.AmountReceived,
 		BurningPercent:         j.BurningPercent,
 		CreatedAt:              j.CreatedAt,
@@ -132,6 +137,15 @@ func (p *Payment) UnmarshalJSON(b []byte) error {
 	default:
 		// Any other type (including nil) converts to a zero value,
 		// which is the default. Do nothing.
+	}
+	switch j.ID.(type) {
+	case string:
+		z.ID = j.ID.(string)
+	case float64:
+		z.ID = fmt.Sprintf("%d", int(j.ID.(float64)))
+	default:
+		// Any other type converts to the default value for the type.
+		// Do nothing.
 	}
 	*p = z
 	return nil
