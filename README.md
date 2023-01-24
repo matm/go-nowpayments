@@ -36,6 +36,60 @@ Topic|Endpoint|Package.Method|Implemented
 $ go get github.com/matm/go-nowpayments@v1.0.4
 ```
 
+## Usage
+
+Just load the config with all the credentials from a file or using a `Reader` then display the NOWPayments' API status and the last 2 payments
+made with:
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"strings"
+
+	"github.com/matm/go-nowpayments/config"
+	"github.com/matm/go-nowpayments/core"
+	"github.com/matm/go-nowpayments/payments"
+)
+
+func main() {
+      // Load sandbox's credentials.
+	err := config.Load(strings.NewReader(`
+{
+      "server": "https://api-sandbox.nowpayments.io/v1",
+      "login": "some_email@domain.tld",
+      "password": "some_password",
+      "apiKey": "some_api_key"
+}
+`))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Use the server URL defined above.
+	core.UseBaseURL(core.BaseURL(config.Server()))
+	// Use default HTTP client.
+	core.UseClient(core.NewHTTPClient())
+
+	st, err := core.Status()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("API status:", st)
+
+	const limit = 2
+	ps, err := payments.List(&payments.ListOption{
+		Limit: limit,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Last %d payments: %v\n", limit, ps)
+}
+```
+
 ## CLI Tool
 
 A `np` tool is available to easily play with the payments API from the command line. Please make sure to target the sandbox API server in this case.
@@ -51,7 +105,10 @@ Usage of np:
   -a float
         pay amount for new payment/invoice (default 2)
   -c    show list of selected currencies
-  -d    turn debugging on
+  -case string
+        payment's case (sandbox only) (default "success")
+  -debug
+        turn debugging on
   -f string
         JSON config file to use
   -i    new invoice
@@ -59,6 +116,8 @@ Usage of np:
   -n    new payment
   -p string
         status of payment ID
+  -pc string
+        crypto currency to pay in (default "xmr")
   -pi string
         new payment from invoice ID
 ```

@@ -20,7 +20,7 @@ func main() {
 	payAmount := flag.Float64("a", 2.0, "pay amount for new payment/invoice")
 	payCurrency := flag.String("pc", "xmr", "crypto currency to pay in")
 	listPayments := flag.Bool("l", false, "list all payments")
-	debug := flag.Bool("d", false, "turn debugging on")
+	debug := flag.Bool("debug", false, "turn debugging on")
 	showCurrencies := flag.Bool("c", false, "show list of selected currencies")
 	newInvoice := flag.Bool("i", false, "new invoice")
 	newPaymentFromInvoice := flag.String("pi", "", "new payment from invoice ID")
@@ -45,6 +45,7 @@ func main() {
 
 	if *debug {
 		core.WithDebug(true)
+		fmt.Fprintln(os.Stderr, "Debug:", *debug)
 	}
 
 	if *paymentID != "" {
