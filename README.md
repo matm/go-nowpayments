@@ -38,7 +38,8 @@ $ go get github.com/matm/go-nowpayments@v1.0.4
 
 ## Usage
 
-Just load the config with all the credentials from a file or using a `Reader` then display the NOWPayments' API status with:
+Just load the config with all the credentials from a file or using a `Reader` then display the NOWPayments' API status and the last 2 payments
+made with:
 
 ```go
 package main
@@ -50,6 +51,7 @@ import (
 
 	"github.com/matm/go-nowpayments/config"
 	"github.com/matm/go-nowpayments/core"
+	"github.com/matm/go-nowpayments/payments"
 )
 
 func main() {
@@ -76,6 +78,15 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("API status:", st)
+
+	const limit = 2
+	ps, err := payments.List(&payments.ListOption{
+		Limit: limit,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Last %d payments: %v\n", limit, ps)
 }
 ```
 
