@@ -45,10 +45,13 @@ func List(o *ListOption) ([]*Payment, error) {
 	if err != nil {
 		return nil, eris.Wrap(err, "list")
 	}
-	pl := make([]*Payment, 0)
+	type plist struct {
+		Data []*Payment `json:"data"`
+	}
+	pl := &plist{Data: make([]*Payment, 0)}
 	par := &core.SendParams{
 		RouteName: "payments-list",
-		Into:      &pl,
+		Into:      pl,
 		Values:    u,
 		Token:     tok,
 	}
@@ -56,5 +59,5 @@ func List(o *ListOption) ([]*Payment, error) {
 	if err != nil {
 		return nil, err
 	}
-	return pl, nil
+	return pl.Data, nil
 }

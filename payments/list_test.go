@@ -28,7 +28,7 @@ func TestList(t *testing.T) {
 						case "/v1/auth":
 							return newResponseOK(`{"token":"tok"}`)
 						case "/v1/payment/":
-							return newResponseOK(`[{"payment_id":1}]`)
+							return newResponseOK(`{"data":[{"payment_id":1}]}`)
 						default:
 							t.Fatalf("unexpected route call %q", req.URL.Path)
 						}
@@ -49,7 +49,7 @@ func TestList(t *testing.T) {
 						case "/v1/auth":
 							return newResponseOK(`{"token":"tok"}`)
 						case "/v1/payment/":
-							return newResponseOK(`[{"payment_id":"54321"}]`)
+							return newResponseOK(`{"data":[{"payment_id":"54321"}]}`)
 						default:
 							t.Fatalf("unexpected route call %q", req.URL.Path)
 						}
