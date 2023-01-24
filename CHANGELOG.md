@@ -1,3 +1,6 @@
+v 1.0.4
+  - create payment: prevent unmarshalling errors for pay_amount. #36
+
 v 1.0.3
   - Unmarshal error on payment creation in production environment. #34
 
